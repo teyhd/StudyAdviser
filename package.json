@@ -1,0 +1,11 @@
+{
+  "name": "adviser",
+  "version": "1.0.0",
+  "description": "TEYHD Personal adviser for students",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TEYHD",
+  "license": "ISC"
+}
