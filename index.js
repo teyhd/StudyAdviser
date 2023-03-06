@@ -79,6 +79,7 @@ var XLSX = require("xlsx");
 //const fs = require('fs');
 const path = require('path');
 const fs = require('fs-extra');
+const { isNull } = require("util");
 var appDir = path.dirname(require.main.filename);
 
 var files = fs.readdirSync(path.join(appDir,"reports"))
@@ -93,35 +94,111 @@ var lesname = ""
 for (let i = 0; i < files.length; i++) {
 // lesname += readall(files[i])
 }
+var pup = []
+pup['Аврамклва'] = []
+pup['неАврамклва'] = []
+pup['Аврамклва']["Русский"]=5
+pup['неАврамклва']["Русский"]=5
+pup['Аврамклва']["НЕРусский"]=2
+pup['неАврамклва']["НЕРусский"]=3
+pup['Аврамклва']["Матем"]=2
+pup['неАврамклва']["Матем"]=3
+//console.log(pup);
+//console.log(pup['неАврамклва']);
 
-readall("5А.xls")
+//console.log(user);
+readall("7А.xls")
 function readall(nameis) {
-    var lesstn = ""
+console.log(`Обработка файла: ${nameis}`);
+var lesstn = ""
 var workbook = XLSX.readFile(path.join(appDir,"reports",nameis));
-//console.log(workbook.Sheets.Лист1.E12);
-for (let i = 0; i < workbook.Strings.length; i++) {
-    //console.dir(workbook.Strings[i]);    
-}
-//3-4 строка период отчета
-//console.dir(workbook.Strings[11]);
 var jsons = XLSX.utils.sheet_to_json(workbook.Sheets.Лист1, { header: "A" });
-console.dir(JSON.stringify(jsons).match(/ФИО/gm)); //МОЖНО УЗНАТЬ СКОЛЬКО СТРАНИЦ
+//console.dir(JSON.stringify(jsons).match(/"[a-zA-Z]+":"ФИО"/gm)); //МОЖНО УЗНАТЬ СКОЛЬКО СТРАНИЦ
+//console.dir(JSON.stringify(jsons).match(/[^,]+\s[0-9]{1,2}"/gm)); //МОЖНО УЗНАТЬ Что-то еще
+console.log(`Количество строк: ${jsons.length}`);
+let startIndexVal = null
+for (let k = 0; k < jsons.length; k++) {
+   startIndexVal = getKeyByValue(jsons[k], "За период")
+  if (startIndexVal!=undefined) {
+    startIndexVal = k
+    break;
+  }
+}
+if (startIndexVal==null) {
+  console.log(`Ошибка обработки файла! Не найдена страница за период.`);
+  return 0
+}
+console.log(`Строка "За период": №${startIndexVal}`);
+var pages = []
+for (let i = startIndexVal; i < jsons.length; i++) {
+  let NameColumn = getKeyByValue(jsons[i], "ФИО")
+  if (NameColumn!=undefined) {
+    pages.push([i,NameColumn])
+   // pages[i] = NameColumn
+  }
+// console.log(i);
+ // console.dir(jsons[i]);
+ // console.log(getKeyByValue(jsons[i], "ФИО"));
+ fs.writeFileSync(path.join(appDir,`Предметы.txt`), `\n,${JSON.stringify(jsons[i])}`,{ encoding: "utf-8", flag: "a" });
+}
+pages.push([jsons.length])
+var PupilsInfo = []
+for (let i = 0; i < pages.length-1; i++) {
+ // console.log(jsons[pages[i][0]]);
 
-for (var prop in jsons[5]) {
-    if (prop!="C" && prop!="E" && prop!="L" && prop!="M" ) {
-        lesstn += `\n${JSON.stringify(jsons[5][prop]).replace(/["]/gi,'')}`
+  for (let k = pages[i][0]; k < pages[i+1][0]; k++) {
+    //const element = jsons[k];
+    let fio = jsons[k][pages[i][1]]
+    if (fio) {
+     // console.log(k,fio);
+     if (!PupilsInfo[fio]) {
+      PupilsInfo[fio] = []
+     }
+     //console.log();
+     for (var key in jsons[k]) {
+      if (Object.hasOwnProperty.call(jsons[k], key)) {
+        //let TO = JSON.parse(`{"${key}":"${jsons[k][key]}"}`)
+        let TO = {pole:jsons[pages[i][0]][key],zn:jsons[k][key]} 
+        PupilsInfo[fio].push(TO)
+      }
+     }
+     if (fio=="ИГНАТЬЕВА Вероника Олеговна") {
+      fs.writeFileSync(path.join(appDir,`ИГНАТЬЕВА.txt`), `\n${JSON.stringify(jsons[k])}`,{ encoding: "utf-8", flag: "a" });
+     }
+     
 
-       // fs.writeFileSync(path.join(appDir,`Предметы.txt`), `\n${JSON.stringify(jsons[5][prop]).replace(/["]/gi,'')}`,{ encoding: "utf-8", flag: "a" });
+    }
+    
+  }
+  
+  //console.log(pages[i+1]);
+}
+
+//console.log('\n\n\n');
+
+  console.log(typeof PupilsInfo);
+  for (let key in PupilsInfo) {
+    if (Object.hasOwnProperty.call(PupilsInfo, key)) {
+      let element = PupilsInfo[key].reduce(
+        (obj, item) => Object.assign(obj, { [item.pole]: item.zn }), {});
+        PupilsInfo[key] = element
+        fs.writeFileSync(path.join(appDir,`test.txt`), `\n${JSON.stringify(element)}`,{ encoding: "utf-8", flag: "a" });
     }
   }
-fs.writeFileSync(path.join(appDir,"log",`${nameis}.txt`), JSON.stringify(jsons));
+console.log(PupilsInfo);
 
+//console.log(jsons[pages[0][0]]);
+/* Создание таблицы
 var worksheet = XLSX.utils.json_to_sheet(jsons);
 var workbook = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-//XLSX.writeFile(workbook, "Presidents.xls");
-
+XLSX.writeFile(workbook, "Presidents.xls");
+*/
 return lesstn
 }
 
-fs.writeFileSync(path.join(appDir,`Предметы.txt`),lesname ,{ encoding: "utf-8"});
+
+//fs.writeFileSync(path.join(appDir,`Предметы.txt`),lesname ,{ encoding: "utf-8"});
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
+}
