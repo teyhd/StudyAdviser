@@ -92,22 +92,13 @@ var files = fs.readdirSync(path.join(appDir,"reports"))
 // Or
 var lesname = ""
 for (let i = 0; i < files.length; i++) {
-// lesname += readall(files[i])
+ lesname += readall(files[i])
 }
-var pup = []
-pup['Аврамклва'] = []
-pup['неАврамклва'] = []
-pup['Аврамклва']["Русский"]=5
-pup['неАврамклва']["Русский"]=5
-pup['Аврамклва']["НЕРусский"]=2
-pup['неАврамклва']["НЕРусский"]=3
-pup['Аврамклва']["Матем"]=2
-pup['неАврамклва']["Матем"]=3
 //console.log(pup);
 //console.log(pup['неАврамклва']);
 
 //console.log(user);
-readall("7А.xls")
+//readall("7А.xls")
 function readall(nameis) {
 console.log(`Обработка файла: ${nameis}`);
 var lesstn = ""
@@ -159,6 +150,11 @@ for (let i = 0; i < pages.length-1; i++) {
       if (Object.hasOwnProperty.call(jsons[k], key)) {
         //let TO = JSON.parse(`{"${key}":"${jsons[k][key]}"}`)
         let TO = {pole:jsons[pages[i][0]][key],zn:jsons[k][key]} 
+        if (jsons[k][key]<3 && jsons[pages[i][0]][key] !="№ п/п" && jsons[pages[i][0]][key] !="Рейтинг") {
+          console.log(`\nПРОБЛЕМНЫЙ РЕбЕНОК!`);
+          console.warn(`${fio} ${jsons[pages[i][0]][key]} ${jsons[k][key]}`);
+          console.log(`ПРОБЛЕМНЫЙ РЕбЕНОК!\n`);
+        }
         PupilsInfo[fio].push(TO)
       }
      }
@@ -176,7 +172,7 @@ for (let i = 0; i < pages.length-1; i++) {
 
 //console.log('\n\n\n');
 
-  console.log(typeof PupilsInfo);
+  //console.log(typeof PupilsInfo);
   for (let key in PupilsInfo) {
     if (Object.hasOwnProperty.call(PupilsInfo, key)) {
       let element = PupilsInfo[key].reduce(
@@ -185,7 +181,7 @@ for (let i = 0; i < pages.length-1; i++) {
         fs.writeFileSync(path.join(appDir,`test.txt`), `\n${JSON.stringify(element)}`,{ encoding: "utf-8", flag: "a" });
     }
   }
-console.log(PupilsInfo);
+//console.log(PupilsInfo);
 
 //console.log(jsons[pages[0][0]]);
 /* Создание таблицы
