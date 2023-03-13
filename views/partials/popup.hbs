@@ -1,0 +1,96 @@
+  <div id="modal1" class="modal valign-wrapper">
+    <div class="modal-content">
+      <h4>Авторизация</h4>
+        <form id="formauth" class="col s12 login" action="upl" method="post" enctype="multipart/form-data">
+            <div class="row">
+            <label for="login">Логин</label>
+            <input class="validate" type="text" name="login" id="login" placeholder="Введите логин от рабочего компьютера i.familia"/>
+            <label for="pass">Пароль</label>
+            <input class="validate" type="password" name="pass" id="pass" placeholder="Введите пароль от рабочего компьютера"/>
+            
+            </div>
+              <div class="row">
+                <div class="col s6"><button class="mbtn btn red modal-close" id="close">Закрыть</button></div>
+                <div class="col s6"><button class="mbtn btn modal-close" id="btnl" type="submit">ОК</button></div>
+            </div>
+
+          
+        </form> 
+    </div>
+  </div>
+
+    <div id="modal2" class="modal valign-wrapper">
+    <div class="modal-content">
+      <h4>Запись на консультацию</h4>
+        <form id="formauth" class="col s12 login" action="upl" method="post" enctype="multipart/form-data">
+            <div class="row">
+            <label for="login">Укажите предмет</label>
+            <input class="validate" type="text" name="login" id="login" placeholder="Предмет"/>
+            <label for="pass">Дату</label>
+            <input class="validate" type="text" name="pass" id="pass" placeholder="Дата"/>
+            <label for="pass">Цель консультации</label>
+            <input class="validate" type="text" name="pass" id="pass" placeholder="Цель"/>
+            <label for="pass">ФИО педагога</label>
+            <input class="validate" type="text" name="pass" id="pass" placeholder="Цель"/>
+            
+            </div>
+              <div class="row">
+                <div class="col s6"><button class="mbtn btn red modal-close" id="close">Закрыть</button></div>
+                <div class="col s6"><button class="mbtn btn modal-close" id="btnl" type="submit">ОК</button></div>
+            </div>
+
+          
+        </form> 
+    </div>
+  </div>
+
+    <div id="modal3" class="modal valign-wrapper">
+    <div class="modal-content">
+      <h4 class="centereds">Сообщить об ошибке</h4>
+        <form id="formerr" class="col s12 login" action="err" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="input-field col s12">
+                    <textarea placeholder="Подробно опишите проблему" name="new_err" id="new_err" class="materialize-textarea"></textarea>
+                    <label for="new_text">Описание ошибки</label>
+                </div>
+                <div class="input-field col s12">
+                    <input placeholder="https://" id="new_link" name="new_link" type="text" class="validate">
+                    <label class="active" for="new_link">Ссылка на страницу с ошибкой</label>
+                </div>   
+                <div class="input-field col s12 m6">
+                    <input placeholder="Гришина Елена" id="new_auth" name="new_auth" type="text" class="validate" value="{{uname}}">
+                    <label class="active" for="new_auth">Представьтесь, пожалуйста</label>
+                </div>      
+                 <div class="input-field col s12 m6">
+                    <input placeholder="+79998887766" id="doc_num" name="doc_num" type="text" class="validate">
+                    <label class="active" for="doc_num">Телефон для связи</label>
+                </div>
+                <div class="input-field col s12">
+                        <div class="file-field input-field">
+                            <div class="btn blue">
+                                <span>Загрузить скриншот</span>
+                                <input type="file" name='screns' id="sctgs">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" id="all_pic_name" name="file" type="text" placeholder="Загрузите скриншот">
+                            </div>
+                        </div>
+                    </div>
+                <div class="input-field col s12 center">
+                    <h5>Вставьте скриншот</h5>
+                      <p>Чтобы сделать скриншот</p>      
+                      <ul>
+                        <li>Нажмите на клавиатуре: PrintScreen или комбинацию Win+Shift+S</li>
+                        <li>Если вы нажали комбинацию Win+Shift+S: Выделите область</li>
+                        <li>Откройте форму "Сообщить об ошибке"</li>
+                        <li>Нажмите комбинацию Ctrl+V</li>
+                      </ul>            
+                    </div>
+                <div class="input-field col s6 offset-s3">
+                    <img class="materialboxed responsive-img center-align" src="" id="imgss">
+                </div>
+                <div class="input-field col s12"><button class="mbtn btn" id="senderr" type="submit" value="btn">Отправить</button></div>
+            </div>
+        </form> 
+    </div>
+  </div>

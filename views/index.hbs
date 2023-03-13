@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col s12">
+        <h4 class="center">Личный кабинет воспитанницы</h4>
+        <h5 class="center flow-text">{{fio}}</h5>
+        <div class="input-field col s3 offset-s3">
+            <input type="text" id="start_date" class="datepicker" value="{{start}}">
+            <label for="start_date">Начальная дата</label>
+        </div>
+        <div class="input-field col s3">
+            <input type="text" id="end_date" class="datepicker" value="{{stop}}">
+            <label for="end_date">Конечная дата</label>
+        </div>
+
+    <div class="col s12">
+    <table border="1" class="centered striped highlight ">
+        <thead>
+            <tr><th colspan="6">График консультаций</th></tr>
+            <tr>
+                <th>День недели</th>
+                <th>Время</th>
+                <th>Предмет</th>
+                <th>Педагог</th>
+                <th>Кабинет</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#if cons.length}}
+            {{#each cons}}
+            <tr>
+                <td rowspan="{{this.col}}" class="verticalk">{{this.name}}</td>
+                    {{#each this.schedule}}
+                    <tr>
+                        <td>{{this.time}}</td>
+                        <td>{{this.subj}}</td>
+                        <td>{{this.teacher}}</td>
+                        <td>{{this.where}}</td>
+                    </tr>
+                {{/each}}
+            </tr>  
+            {{/each}}
+        {{/if}}
+        </tbody>
+    </table>
+    <p></p>
+    <table border="1" class="centered striped highlight ">
+        <thead>
+            <tr><th colspan="10">Посещаемость</th></tr>
+            <tr>
+                <th>Дата</th>
+                <th>Предмет</th>
+                <th>Педагог</th>
+                <th>Время прибытия</th>
+                <th>Время убытия</th>
+                <th>Комментарий</th>
+                <th>Файлы</th>
+                <th>Кл. рук. смотрел</th>
+                <th>Ст. курса смотрел</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#if statics.length}}
+            {{#each statics}}
+            <tr>
+                <td>{{mpdate}}</td>
+                <td>{{subj}}</td>
+                <td>{{teacher}}</td>
+                <td>{{timestart}}</td>
+                <td>{{timestop}}</td>
+                <td>{{comm}}</td>
+                <td>{{files}}</td>
+                <td>{{kl}}</td>
+                <td>{{stk}}</td>
+            </tr>  
+            {{/each}}
+        {{/if}}
+        </tbody>
+    </table>
+    </div>
+    <div class="col s12">
+        <h5 class="center">Динамика обучения</h5>
+        <img class="materialboxed responsive-img center-align" src="img/1.jpg">
+    </div>
+</div>
+

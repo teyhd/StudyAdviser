@@ -1,0 +1,27 @@
+
+ 16:50:41 Глобальный косяк приложения!!!  Error: Cannot find module 'cookie-parser'
+Require stack:
+- F:\adviser\index.js
+    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:933:15)
+    at Function.Module._load (node:internal/modules/cjs/loader:778:27)
+    at Module.require (node:internal/modules/cjs/loader:1005:19)
+    at require (node:internal/modules/cjs/helpers:102:18)
+    at Object.<anonymous> (F:\adviser\index.js:85:20)
+    at Module._compile (node:internal/modules/cjs/loader:1105:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1159:10)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)
+ 17:06:45 Глобальный косяк приложения!!!  ReferenceError: TEMPFOLDER is not defined
+    at Object.<anonymous> (F:\adviser\index.js:139:17)
+    at Module._compile (node:internal/modules/cjs/loader:1105:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1159:10)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)
+    at node:internal/main/run_main_module:17:47
+ 17:07:58
+ 17:08:28 Сервер менеджера новостей - запущен
+ 17:08:28 Порт: 80
+ 17:10:01 Сервер консультаций - запущен
+ 17:10:01 Порт: 80

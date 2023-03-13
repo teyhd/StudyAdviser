@@ -1,0 +1,44 @@
+
+<nav class="#880e4f pink darken-3 #4a148c purple darken-3">
+<div class="nav-wrapper">
+    <a href="/" class="brand-logo right hide-on-med-and-up">Индивидуальный маршрут</a>
+    <a href="/" class="brand-logo center hide-on-small-only">Индивидуальный маршрут</a>
+    <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    <ul class="right hide-on-med-and-down">
+    <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">Меню<i class="material-icons right">arrow_drop_down</i></a></li>
+    {{#if auth}}
+    <li><a href="/logout">Выход<i class="material-icons right">account_circle</i></a></li>
+    {{else}}
+    <li><a class="modal-trigger" href="#modal1" name="login">Вход<i class="material-icons right">account_circle</i></a></li>
+    {{/if}}
+    </ul>
+</div>
+</nav>
+  <!-- ВЫПАДАЮЩЕЕ МЕНЮ -->
+  <div class="dropdown-content row" id="dropdown1" >
+        <ul >
+         {{>navli}}
+      </ul>
+  </div>
+
+ <!-- МЕНЮ ДЛЯ ТЕЛЕФОНА -->
+  <ul class="sidenav" id="mobile-demo">
+        {{#if auth}}
+        <li><a href="/logout">Выход<i class="material-icons">account_circle</i></a></li>
+        {{else}}
+        <li><a class="modal-trigger" href="#modal1" name="login">Вход<i class="material-icons">account_circle</i></a></li>
+        {{/if}}    
+        {{>navli}}
+  </ul>
+
+<script> 
+$( document ).ready(function () {
+  $(".dropdown-trigger").dropdown(
+    {
+    alignment:'right',
+    constrainWidth:false,
+    coverTrigger:false,
+    hover:true});
+  $('.sidenav').sidenav();
+})
+</script>  

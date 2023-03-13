@@ -74,127 +74,195 @@ var opts = {
   };
 */
 
-
-var XLSX = require("xlsx");
-//const fs = require('fs');
+const logman = require('./vendor/logs.js');
+process.on('uncaughtException', (err) => {
+  logman.log('Глобальный косяк приложения!!! ', err.stack);
+}); //Если все пошло по пизде, спасет ситуацию
+const express = require('express');
+const exphbs = require('express-handlebars');
+const fileUpload = require('express-fileupload');
+const session = require('express-session');
+var cookieParser = require('cookie-parser');
+var unixTime = require('unix-time');
 const path = require('path');
 const fs = require('fs-extra');
-const { isNull } = require("util");
+
+const db = require('./vendor/db.js');
+const dbworker = new db.dbworker();
+
+const { json } = require('express');
 var appDir = path.dirname(require.main.filename);
-
-var files = fs.readdirSync(path.join(appDir,"reports"))
-      console.log(files);  
-       /* files.find(function(item, index, array) {
-          if(item == 'Инструкция.docx'){
-            array.splice(index, 1); 
-          }})*/
-      
-// Or
-var lesname = ""
-for (let i = 0; i < files.length; i++) {
- lesname += readall(files[i])
-}
-//console.log(pup);
-//console.log(pup['неАврамклва']);
-
-//console.log(user);
-//readall("7А.xls")
-function readall(nameis) {
-console.log(`Обработка файла: ${nameis}`);
-var lesstn = ""
-var workbook = XLSX.readFile(path.join(appDir,"reports",nameis));
-var jsons = XLSX.utils.sheet_to_json(workbook.Sheets.Лист1, { header: "A" });
-//console.dir(JSON.stringify(jsons).match(/"[a-zA-Z]+":"ФИО"/gm)); //МОЖНО УЗНАТЬ СКОЛЬКО СТРАНИЦ
-//console.dir(JSON.stringify(jsons).match(/[^,]+\s[0-9]{1,2}"/gm)); //МОЖНО УЗНАТЬ Что-то еще
-console.log(`Количество строк: ${jsons.length}`);
-let startIndexVal = null
-for (let k = 0; k < jsons.length; k++) {
-   startIndexVal = getKeyByValue(jsons[k], "За период")
-  if (startIndexVal!=undefined) {
-    startIndexVal = k
-    break;
-  }
-}
-if (startIndexVal==null) {
-  console.log(`Ошибка обработки файла! Не найдена страница за период.`);
-  return 0
-}
-console.log(`Строка "За период": №${startIndexVal}`);
-var pages = []
-for (let i = startIndexVal; i < jsons.length; i++) {
-  let NameColumn = getKeyByValue(jsons[i], "ФИО")
-  if (NameColumn!=undefined) {
-    pages.push([i,NameColumn])
-   // pages[i] = NameColumn
-  }
-// console.log(i);
- // console.dir(jsons[i]);
- // console.log(getKeyByValue(jsons[i], "ФИО"));
- fs.writeFileSync(path.join(appDir,`Предметы.txt`), `\n,${JSON.stringify(jsons[i])}`,{ encoding: "utf-8", flag: "a" });
-}
-pages.push([jsons.length])
-var PupilsInfo = []
-for (let i = 0; i < pages.length-1; i++) {
- // console.log(jsons[pages[i][0]]);
-
-  for (let k = pages[i][0]; k < pages[i+1][0]; k++) {
-    //const element = jsons[k];
-    let fio = jsons[k][pages[i][1]]
-    if (fio) {
-     // console.log(k,fio);
-     if (!PupilsInfo[fio]) {
-      PupilsInfo[fio] = []
-     }
-     //console.log();
-     for (var key in jsons[k]) {
-      if (Object.hasOwnProperty.call(jsons[k], key)) {
-        //let TO = JSON.parse(`{"${key}":"${jsons[k][key]}"}`)
-        let TO = {pole:jsons[pages[i][0]][key],zn:jsons[k][key]} 
-        if (jsons[k][key]<3 && jsons[pages[i][0]][key] !="№ п/п" && jsons[pages[i][0]][key] !="Рейтинг") {
-          console.log(`\nПРОБЛЕМНЫЙ РЕбЕНОК!`);
-          console.warn(`${fio} ${jsons[pages[i][0]][key]} ${jsons[k][key]}`);
-          console.log(`ПРОБЛЕМНЫЙ РЕбЕНОК!\n`);
-        }
-        PupilsInfo[fio].push(TO)
-      }
-     }
-     if (fio=="ИГНАТЬЕВА Вероника Олеговна") {
-      fs.writeFileSync(path.join(appDir,`ИГНАТЬЕВА.txt`), `\n${JSON.stringify(jsons[k])}`,{ encoding: "utf-8", flag: "a" });
-     }
-     
-
+const TEMPFOLDER = path.join(appDir,'public/temp');
+var PORT = process.env.PORT || 80; 
+const app = express();
+var i_count = 1
+const hbs = exphbs.create({
+defaultLayout: 'main',
+extname: 'hbs',
+helpers: {
+  OK: function(){
+    i_count = 1
+  },
+  I_C: function (opts){
+    let anso = ''
+    for (let i = 0; i < i_count; i++) {
+      anso = anso + "I"
     }
-    
-  }
-  
-  //console.log(pages[i+1]);
+    i_count++
+    return anso
+  },
+  if_eq: function (a, b, opts) {
+      if (a == b){ // Or === depending on your needs
+         // logman.log(opts);
+          return opts.fn(this);
+       } else
+          return opts.inverse(this);
+  },
+  if_more: function (a, b, opts) {
+    if (a >= b){ // Or === depending on your needs
+       // logman.log(opts);
+        return opts.fn(this);
+     } else
+        return opts.inverse(this);
 }
+}
+});
 
-//console.log('\n\n\n');
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views','views');
+app.use(express.static(path.join(__dirname, 'public')));
 
-  //console.log(typeof PupilsInfo);
-  for (let key in PupilsInfo) {
-    if (Object.hasOwnProperty.call(PupilsInfo, key)) {
-      let element = PupilsInfo[key].reduce(
-        (obj, item) => Object.assign(obj, { [item.pole]: item.zn }), {});
-        PupilsInfo[key] = element
-        fs.writeFileSync(path.join(appDir,`test.txt`), `\n${JSON.stringify(element)}`,{ encoding: "utf-8", flag: "a" });
+app.use(cookieParser());
+//app.use(fileUpload());
+app.use(session({resave:false,saveUninitialized:false, secret: 'keyboard cat', cookie: {  }}))
+app.use(fileUpload({
+  useTempFiles : true,
+  tempFileDir : TEMPFOLDER,
+  defCharset: 'utf8',
+  defParamCharset: 'utf8'
+}));
+
+app.get('/',(req,res)=>{
+let currentDate = new Date();
+let firstDayOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
+let lastDayOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 7));
+
+  const cons = [
+    { name: "11.03 Понедельник", 
+      schedule: [
+          {
+          time:"14:30 - 15:00",
+          subj:"Алгебра 7",
+          teacher:"Яборова А. Д.",
+          where:"312"},{
+          time:"15:10 - 15:50",
+          subj:"Русский 7",
+          teacher:"Кириллова Я. В.",
+          where:"230"}
+        ],
+        col: 1
+    },
+    { name: "14.03 Вторник", 
+    schedule: [
+        {mpdate:"11.03",
+        time:"12:30 - 17:40",
+        subj:"Алгебра 7",
+        teacher:"Яборова А. Д.",
+        where:"518"}
+      ],
+      col:1
+    },    { name: "15.03\nСреда", 
+    schedule: [
+        {mpdate:"11.03",
+        time:"12:30 - 17:40",
+        subj:"Алгебра 7",
+        teacher:"Яборова А. Д.",
+        where:"518"},{mpdate:"11.03",
+        time:"12:30 - 17:40",
+        subj:"Русский 7",
+        teacher:"Кириллова Я. В.",
+        where:"518"},{mpdate:"11.03",
+        time:"12:30 - 17:40",
+        subj:"Русский 7",
+        teacher:"Кириллова Я. В.",
+        where:"518"}
+      ],
+      col:1
     }
+  ];
+
+  var statics = [
+    {
+      mpdate:"11.03",
+      subj:"Алгебра 7",
+      teacher:"Яборова А. Д.",
+      timestart:"14:20",
+      timestop:"15:00",
+      comm: "Без замечаний",
+      files: "Материал.Docx",
+      kl: "11.03 16:53",
+      stk: "11.03 17:00",
+    },
+    {
+      mpdate:"11.03",
+      subj:"Русский 7",
+      teacher:"Кириллова Я. В.",
+      timestart:"15:10",
+      timestop:"15:50",
+      comm: "Пришла сонная, материал по заданной главе не выучила!",
+      files: "Материал.Docx",
+      kl: "11.03 16:53",
+      stk: "11.03 17:00",
+    },
+    {
+      mpdate:"11.03",
+      subj:"Русский 7",
+      teacher:"Кириллова Я. В.",
+      timestart:"16:10",
+      timestop:"16:50",
+      comm: "Опоздала на занятие",
+      files: "Материал.Docx",
+      kl: "11.03 16:53",
+      stk: "11.03 17:00",
+    },
+  ]
+  cons.forEach(e => {
+    e.col = e.schedule.length + 1
+  });
+  res.render('index',{
+    title: 'Индивидуальный маршрут',
+    fio: "АЛЬБЕКОВА Виктория Владимировна",
+    start:firstDayOfWeek.toLocaleDateString(),
+    stop: lastDayOfWeek.toLocaleDateString(),
+    cons: cons,
+    statics:statics
+  });
+})
+app.get('/t',(req,res)=>{
+  res.render('teacher',{
+    title: 'ЛК педагога',
+  })
+})
+app.get('/manual',(req,res)=>{
+  res.render('manual',{
+    title: 'Инструкция',
+  })
+})
+async function start(){
+  try {
+      app.listen(PORT,()=> {
+        logman.log('Сервер консультаций - запущен')
+        logman.log('Порт:',PORT);
+      })
+  } catch (e) {
+      logman.log(e);
   }
-//console.log(PupilsInfo);
-
-//console.log(jsons[pages[0][0]]);
-/* Создание таблицы
-var worksheet = XLSX.utils.json_to_sheet(jsons);
-var workbook = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-XLSX.writeFile(workbook, "Presidents.xls");
-*/
-return lesstn
+}
+function getcurip(str) {
+let arr = str.split(':');
+arr = arr[arr.length-1];
+return arr;
 }
 
-
-//fs.writeFileSync(path.join(appDir,`Предметы.txt`),lesname ,{ encoding: "utf-8"});
-function getKeyByValue(object, value) {
-  return Object.keys(object).find(key => object[key] === value);
-}
+start()
